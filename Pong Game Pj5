@@ -1,0 +1,256 @@
+//Variáveis da Bola
+let xBola = 300;
+let yBola = 200;
+let dBola = 10;
+let corBola = ('#FF0000');
+let raio = dBola / 2;
+
+//Velocidade da Bola
+let velXBola = 4;
+let velYBola = 4;
+
+//Variáveis J1
+let corJ1 = ('#0000FF');
+let xJ1 = 5;
+let yJ1 = 180;
+let wJ1 = 4;
+let hJ1 = 70;
+
+//Variáveis J2
+let corJ2 = ('#00FF00');
+let xJ2 = 590;
+let yJ2 = 180;
+let wJ2 = 4;
+let hJ2 = 70;
+
+//Variáveis CPU
+let cpuVelY;
+let corCpu = ('#FF00FF');
+let xCpu = 590;
+let yCpu = 180;
+let wCpu = 4;
+let hCpu = 70;
+let chanceErro = 0;
+
+//Variável de Colisão
+let contato = false;
+
+//Variáveis de Placar
+let pontosP1 = 0
+let pontosP2 = 0 
+
+//Sons
+let barra;
+let ponto;
+let backtrack;
+
+function preload(){
+  trilha = loadSound("trilha.mp3");
+  ponto = loadSound("ponto.mp3");
+  barra = loadSound("raquetada.mp3");
+}
+
+function setup() {
+  createCanvas(600, 400);
+  //setVolume(10);
+  //trilha.loop();
+}
+
+function draw() {
+  background('#EEFFF8');
+  mostraJ(xJ1,yJ1,corJ1);
+  mostraJ(xJ2,yJ2,corJ2);
+  //mostraJ(xCpu,yCpu,corCpu);
+  mostraBola();
+  movBola();
+  colisaoBorda();
+  movJ1();
+  movJ2();
+  //movCpu();
+  colisaoCollideJ(xJ1,yJ1,wJ1,hJ1);
+  colisaoCollideJ(xJ2,yJ2,wJ2,hJ2);
+  //colisaoCollideJ(xCpu,yCpu,wCpu,hCpu);
+  //colisaoJ1();
+  //colisaoJ2();
+  mostraPlacar();
+  marcaPlacar();
+  fimDeJogo();
+
+}
+
+function mostraBola(){
+  fill(corBola);
+  circle(xBola,yBola,dBola);
+}
+
+function movBola(){
+  if (frameCount % 180 == 0 && 
+      velXBola > 0 && 
+      velYBola > 0 && 
+      velXBola < 15 && 
+      velYBola < 15) 
+  {
+      velXBola ++  && velYBola ++;
+  } 
+  xBola += velXBola;
+  yBola += velYBola;
+}
+
+
+function colisaoBorda(){
+  if (xBola + raio > width || xBola - raio < 0){
+    velXBola *= -1;
+  }
+  if (yBola + raio > height || yBola - raio <0){
+    velYBola *= -1
+  }
+}
+
+function mostraJ(x,y,z){
+  fill(z);
+  rect(x,y,wJ1,hJ1);
+} 
+/*
+function mostraJ2(){
+  fill(corJ2);
+  rect(xJ2,yJ2,wJ2,hJ2);
+}
+
+function mostraCpu(){
+  fill(corCpu);
+  rect(xCpu,yCpu,wCpu,hCpu);
+}
+*/
+  
+function movJ1(){
+  if (keyIsDown('87')){
+    yJ1 -= 10
+  }
+   if (keyIsDown('83')){
+    yJ1 += 10
+  }
+}
+
+function movJ2(){
+  if (keyIsDown(UP_ARROW)){
+    yJ2 -= 10
+  }
+   if (keyIsDown(DOWN_ARROW)){
+    yJ2 += 10
+  }
+}
+
+function movCpu(){
+  
+  cpuVelY = yBola - yCpu - hJ1/2 - 30;
+  
+  yCpu += cpuVelY + chanceErro
+  
+  calcChanceErro()
+  
+  }
+
+function calcChanceErro(){
+  if(pontosP2 >= pontosP1){
+    chanceErro += 1
+    if(chanceErro >= 39){
+      chanceErro = 40
+    } 
+    }else {
+      chanceErro -= 1
+      if (chanceErro <= 35){
+        chanceErro = 35
+      }
+    }
+}
+
+
+
+function colisaoCollideJ(x,y,w,h){
+  contato = 
+  collideRectCircle(x,y,w,h,xBola,yBola,raio);
+  
+  if(contato){
+    velXBola *= -1;
+    barra.play();
+  }
+}
+/*
+function colisaoCollideJ2(){
+  contato = 
+  collideRectCircle(xJ2,yJ2,wJ2,hJ2,xBola,yBola,raio);
+  
+  if(contato){
+    velXBola *= -1;
+  }
+}
+
+function colisaoCollideCpu(){
+  contato = 
+  collideRectCircle(xCpu,yCpu,wCpu,hCpu,xBola,yBola,raio);
+  
+  if(contato){
+    velXBola *= -1;
+  }
+}
+*/
+
+/*
+function   colisaoJ1(){
+  if(xBola - raio < xJ1 + wJ1 && 
+     yBola - raio < yJ1 + hJ1 && 
+     yBola + raio > yJ1)
+  {
+    velXBola *= -1
+  }
+}
+
+function   colisaoJ2(){
+  if(xBola + raio > xJ2 + wJ2 - 2 && 
+     yBola - raio < yJ2 + hJ2 &&
+     yBola + raio > yJ2)
+  {
+    velXBola *= -1
+  }
+}
+*/
+
+function mostraPlacar(){
+  stroke('#EEFFF8')
+  textAlign(CENTER);
+  textSize(30);
+  fill('#F2E206B5');
+  rect(225,5,50,30);
+  rect(325,5,50,30);
+  fill(0);
+  text(pontosP1, 250,30);
+  text(pontosP2, 350,30);
+  
+}
+
+function marcaPlacar(){
+   
+  if (xBola - raio < 1){
+    pontosP2 ++
+    ponto.play()
+    xBola = 300
+    yBola = 200
+  }
+  if(xBola + raio > 599){
+    pontosP1 ++
+    ponto.play()
+  }
+  
+}
+
+function fimDeJogo(){
+
+  if (pontosP1 > 6 || pontosP2 > 6) {
+    xBola = 300;
+    yBola = 200;
+    velXBola = 0;
+    velYBola = 0;
+    textAlign(CENTER)
+    text('Fim de Jogo',300,100);
+  }
+}
